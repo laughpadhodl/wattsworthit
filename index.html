@@ -1,1 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WattsWorthIt - Bitcoin Mining Efficiency Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .calculator-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .input-group input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .api-status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .api-status.loading {
+            border-left-color: #ffc107;
+        }
+
+        .api-status.error {
+            border-left-color: #dc3545;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .variables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .variable-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .variable-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .variable-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .calculator-container {
+                padding: 20px;
+            }
+            
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ WattsWorthIt</h1>
+            <p>Bitcoin Mining Break-Even Efficiency Calculator</p>
+        </div>
+
+        <div class="calculator-container">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="electricityCost">Electricity Cost ($/kWh)</label>
+                    <input type="number" id="electricityCost" placeholder="0.12" step="0.001" min="0">
+                </div>
+            </div>
+
+            <div class="api-status" id="apiStatus">
+                <strong>📡 Market Data:</strong> <span id="statusText">Loading Bitcoin price and network difficulty...</span>
+            </div>
+
+            <div class="results-section">
+                <div class="result-card">
+                    <div class="result-label">Break-Even Efficiency Threshold</div>
+                    <div class="result-value" id="breakEvenResult">-- J/TH</div>
+                    <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                        Your mining rig must operate at or below this efficiency to be profitable
+                    </p>
+                </div>
+            </div>
+
+            <div class="variables-grid">
+                <div class="variable-card">
+                    <div class="variable-value" id="btcPrice">$--</div>
+                    <div class="variable-label">Bitcoin Price</div>
+                </div>
+                <div class="variable-card">
+                    <div class="variable-value" id="networkDifficulty">--</div>
+                    <div class="variable-label">Network Difficulty</div>
+                </div>
+                <div class="variable-card">
+                    <div class="variable-value" id="blockReward">6.25</div>
+                    <div class="variable-label">Block Reward (BTC)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Break-Even Efficiency vs Variable Changes</h3>
+            <div class="chart-wrapper">
+                <canvas id="efficiencyChart"></canvas>
+            </div>
+            <p style="text-align: center; color: #666; margin-top: 10px;">
+                This graph shows how your break-even efficiency threshold changes as market variables fluctuate
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentData = {
+            btcPrice: 0,
+            difficulty: 0,
+            electricityCost: 0.12
+        };
+        
+        let chart = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadMarketData();
+        });
+
+        function setupEventListeners() {
+            const electricityCostInput = document.getElementById('electricityCost');
+            electricityCostInput.addEventListener('input', function() {
+                currentData.electricityCost = parseFloat(this.value) || 0;
+                calculateAndUpdate();
+            });
+            
+            // Set default value
+            electricityCostInput.value = '0.12';
+        }
+
+        async function loadMarketData() {
+            updateStatus('Loading Bitcoin price and network difficulty...', 'loading');
+            
+            try {
+                // Fetch Bitcoin price from CoinGecko API
+                const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                const priceData = await priceResponse.json();
+                currentData.btcPrice = priceData.bitcoin.usd;
+                
+                // For difficulty, we'll use a simulated value since free APIs are limited
+                // In production, you'd fetch from blockchain.info or similar
+                currentData.difficulty = 73000000000000; // Approximate current difficulty
+                
+                updateStatus('✅ Market data loaded successfully', 'success');
+                updateDisplayValues();
+                calculateAndUpdate();
+                
+            } catch (error) {
+                console.error('Error loading market data:', error);
+                updateStatus('⚠️ Using estimated values - API unavailable', 'error');
+                
+                // Fallback values
+                currentData.btcPrice = 65000;
+                currentData.difficulty = 73000000000000;
+                
+                updateDisplayValues();
+                calculateAndUpdate();
+            }
+        }
+
+        function updateStatus(text, type) {
+            const statusElement = document.getElementById('apiStatus');
+            const statusText = document.getElementById('statusText');
+            
+            statusText.textContent = text;
+            statusElement.className = `api-status ${type}`;
+        }
+
+        function updateDisplayValues() {
+            document.getElementById('btcPrice').textContent = `$${currentData.btcPrice.toLocaleString()}`;
+            document.getElementById('networkDifficulty').textContent = 
+                (currentData.difficulty / 1000000000000).toFixed(1) + 'T';
+        }
+
+        function calculateBreakEvenEfficiency(btcPrice, difficulty, electricityCost) {
+            // Bitcoin mining break-even calculation
+            // Formula: J/TH = (Electricity Cost * Block Time * Difficulty) / (BTC Price * Block Reward * 1000)
+            
+            const blockTime = 600; // 10 minutes in seconds
+            const blockReward = 6.25; // Current BTC block reward
+            const secondsPerHour = 3600;
+            
+            // Convert electricity cost from $/kWh to $/J/s
+            const electricityCostPerJoule = electricityCost / (1000 * secondsPerHour);
+            
+            // Calculate revenue per TH/s per second
+            const revenuePerTHPerSecond = (btcPrice * blockReward * Math.pow(10, 12)) / (difficulty * blockTime);
+            
+            // Break-even efficiency in J/TH
+            const breakEvenJPerTH = electricityCostPerJoule / revenuePerTHPerSecond * Math.pow(10, 12);
+            
+            return breakEvenJPerTH;
+        }
+
+        function calculateAndUpdate() {
+            if (currentData.btcPrice && currentData.difficulty && currentData.electricityCost) {
+                const breakEven = calculateBreakEvenEfficiency(
+                    currentData.btcPrice, 
+                    currentData.difficulty, 
+                    currentData.electricityCost
+                );
+                
+                document.getElementById('breakEvenResult').textContent = 
+                    `${breakEven.toFixed(0)} J/TH`;
+                
+                updateChart(breakEven);
+            }
+        }
+
+        function updateChart(baseBreakEven) {
+            const ctx = document.getElementById('efficiencyChart').getContext('2d');
+            
+            // Generate data points for different electricity cost scenarios
+            const electricityRange = [];
+            const efficiencyData = [];
+            
+            const baseCost = currentData.electricityCost;
+            
+            for (let i = -50; i <= 50; i += 5) {
+                const costMultiplier = 1 + (i / 100);
+                const testCost = baseCost * costMultiplier;
+                const efficiency = calculateBreakEvenEfficiency(
+                    currentData.btcPrice, 
+                    currentData.difficulty, 
+                    testCost
+                );
+                
+                electricityRange.push(testCost.toFixed(3));
+                efficiencyData.push(efficiency);
+            }
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: electricityRange,
+                    datasets: [{
+                        label: 'Break-Even Efficiency (J/TH)',
+                        data: efficiencyData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: function(context) {
+                            const value = parseFloat(context.parsed.x);
+                            return Math.abs(value - baseCost) < 0.001 ? '#ff6b6b' : '#667eea';
+                        },
+                        pointRadius: function(context) {
+                            const value = parseFloat(context.parsed.x);
+                            return Math.abs(value - baseCost) < 0.001 ? 8 : 4;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Electricity Cost ($/kWh)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Break-Even Efficiency (J/TH)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

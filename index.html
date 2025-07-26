@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WattsWorthIt - Bitcoin Mining Efficiency Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <title>Watts Worth It - Bitcoin Mining Calculator</title>
     <style>
         * {
             margin: 0;
@@ -16,81 +15,113 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
             color: #333;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
 
-        .header {
+        h1 {
             text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
         }
 
         .main-input-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .primary-input {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .primary-input label {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #555;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .primary-input input {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.5rem;
-            border: 3px solid #e0e0e0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 25px;
             border-radius: 15px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .primary-input input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .results-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             margin-bottom: 30px;
+            text-align: center;
+            color: white;
         }
 
-        .result-header {
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group label {
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
             text-align: center;
-            margin-bottom: 25px;
+            width: 150px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .result-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: crosshair;
+            background: linear-gradient(to right, #ffeaa7, #fab1a0, #e17055);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            pointer-events: none;
+            font-size: 0.9em;
+            z-index: 1000;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+
+        .formula-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
         }
 
         .data-source-toggle {
@@ -101,659 +132,532 @@
             margin-bottom: 20px;
         }
 
-        .toggle-switch {
+        .toggle {
             position: relative;
             width: 60px;
             height: 30px;
-            background: #ddd;
+            background: #ccc;
             border-radius: 15px;
             cursor: pointer;
             transition: background 0.3s;
         }
 
-        .toggle-switch.active {
-            background: #667eea;
+        .toggle.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .toggle-switch::after {
+        .toggle::after {
             content: '';
             position: absolute;
             width: 26px;
             height: 26px;
-            border-radius: 50%;
             background: white;
+            border-radius: 50%;
             top: 2px;
             left: 2px;
             transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .toggle-switch.active::after {
+        .toggle.active::after {
             transform: translateX(30px);
-        }
-
-        .data-source-label {
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .result-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .result-value {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
-        .result-label {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .formula-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-
-        .formula-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
         }
 
         .formula-display {
             background: white;
-            border-radius: 10px;
             padding: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            border: 2px solid #e0e0e0;
-        }
-
-        .formula-variable {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 2px;
-        }
-
-        .formula-variable:hover {
-            background: #5a6fd8;
-            transform: translateY(-1px);
-        }
-
-        .formula-variable.editable {
-            background: #28a745;
-        }
-
-        .formula-variable.editable:hover {
-            background: #218838;
-        }
-
-        .variable-editor {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            z-index: 1000;
-            min-width: 400px;
-        }
-
-        .variable-editor.active {
-            display: block;
-        }
-
-        .editor-backdrop {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .editor-backdrop.active {
-            display: block;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 400px;
-            margin: 20px 0;
-        }
-
-        .api-status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .api-status-card {
-            background: #f8f9fa;
             border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .editable-value {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border: 1px dashed #ffc107;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .editable-value:hover {
+            background: #ffc107;
+            color: white;
+        }
+
+        .api-sources {
+            background: #e8f5e8;
             padding: 15px;
+            border-radius: 10px;
             border-left: 4px solid #28a745;
         }
 
-        .api-status-card.loading {
-            border-left-color: #ffc107;
+        .api-source {
+            margin-bottom: 10px;
+            font-size: 0.9em;
         }
 
-        .api-status-card.error {
-            border-left-color: #dc3545;
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
         }
 
-        .status-source {
-            font-weight: 600;
-            margin-bottom: 5px;
+        .status-fresh {
+            background: #28a745;
         }
 
-        .status-time {
-            font-size: 0.8rem;
-            color: #666;
+        .status-stale {
+            background: #ffc107;
         }
 
-        .btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #5a6fd8;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .main-input-section,
-            .results-section,
-            .chart-container {
                 padding: 20px;
             }
             
-            .variable-editor {
-                min-width: 90vw;
-                margin: 20px;
+            h1 {
+                font-size: 2em;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .result-value {
+                font-size: 2em;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>⚡ WattsWorthIt</h1>
-            <p>Bitcoin Mining Break-Even Efficiency Calculator</p>
-        </div>
+        <h1>⚡ Watts Worth It</h1>
+        <p style="text-align: center; margin-bottom: 30px; color: #666; font-size: 1.1em;">
+            Calculate your Bitcoin mining breakeven efficiency
+        </p>
 
         <div class="main-input-section">
-            <div class="primary-input">
-                <label for="electricityCost">Your Electricity Cost</label>
-                <input type="number" id="electricityCost" placeholder="0.10" step="0.001" min="0">
-                <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">$/kWh</div>
+            <div class="input-group">
+                <label for="electricityCost">Your electricity cost:</label>
+                <input type="number" id="electricityCost" value="0.10" step="0.01" min="0">
+                <span>$/kWh</span>
             </div>
         </div>
 
-        <div class="results-section">
-            <div class="result-header">
-                <div class="data-source-toggle">
-                    <span>Current Market Data</span>
-                    <div class="toggle-switch" id="dataToggle"></div>
-                    <span>Custom Data</span>
-                </div>
-                <div class="data-source-label" id="dataSourceLabel">Using Current Market Data</div>
-            </div>
-
-            <div class="result-card">
-                <div class="result-label">Break-Even Efficiency Threshold</div>
-                <div class="result-value" id="breakEvenResult">-- J/TH</div>
-                <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">
-                    Your mining rig must operate at or below this efficiency to be profitable
-                </p>
-            </div>
-
-            <div class="formula-section">
-                <div class="formula-title">📊 Calculation Formula</div>
-                <div class="formula-display" id="formulaDisplay">
-                    Break-Even J/TH = (<span class="formula-variable" data-var="electricityCost">Electricity Cost</span> × 24 × 1000) ÷ <span class="formula-variable editable" data-var="dailyRevenue">Daily Revenue per TH</span>
-                    <br><br>
-                    Where Daily Revenue per TH = (<span class="formula-variable editable" data-var="totalReward">Total Daily Rewards</span> × <span class="formula-variable editable" data-var="btcPrice">BTC Price</span>) ÷ <span class="formula-variable editable" data-var="networkHashrate">Network Hashrate (TH/s)</span>
-                </div>
-                <div style="margin-top: 15px; font-size: 0.9rem; color: #666; text-align: center;">
-                    💡 Click on the <span style="color: #28a745; font-weight: 600;">green variables</span> to modify values and explore different scenarios
-                </div>
-            </div>
+        <div class="result-section">
+            <h2>Breakeven Mining Efficiency</h2>
+            <div class="result-value" id="breakevenResult">0.00 J/TH/s</div>
+            <p>Miners more efficient than this value will be profitable at your electricity rate</p>
         </div>
 
         <div class="chart-container">
-            <h3 style="text-align: center; margin-bottom: 20px;">Break-Even Efficiency vs Electricity Cost</h3>
-            <div class="chart-wrapper">
-                <canvas id="efficiencyChart"></canvas>
-            </div>
-            <p style="text-align: center; color: #666; margin-top: 10px;">
-                Hover over the graph to see exact efficiency values at different electricity costs
-            </p>
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">Efficiency vs Electricity Cost</h3>
+            <div class="chart" id="efficiencyChart"></div>
         </div>
 
-        <div class="results-section">
-            <h3 style="text-align: center; margin-bottom: 20px;">📡 Data Sources & Status</h3>
-            <div class="api-status-grid" id="apiStatusGrid">
-                <!-- API status cards will be populated here -->
+        <div class="formula-section">
+            <div class="data-source-toggle">
+                <span>Current Market Data</span>
+                <div class="toggle" id="dataToggle"></div>
+                <span>Custom Data</span>
             </div>
-        </div>
-    </div>
+            
+            <div class="formula-display" id="formulaDisplay">
+                <strong>Formula:</strong><br>
+                Breakeven (J/TH/s) = <span class="editable-value" data-field="revenue">0.00</span> × 41.66667 ÷ <span class="editable-value" data-field="electricityCost">0.10</span><br><br>
+                <small>Where 41.66667 = 3,600,000 joules/kWh ÷ 86,400 seconds/day</small>
+            </div>
 
-    <!-- Variable Editor Modal -->
-    <div class="editor-backdrop" id="editorBackdrop"></div>
-    <div class="variable-editor" id="variableEditor">
-        <h3 id="editorTitle">Edit Variable</h3>
-        <div style="margin: 20px 0;">
-            <label id="editorLabel"></label>
-            <input type="number" id="editorInput" step="0.000001">
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button class="btn btn-secondary" onclick="closeEditor()">Cancel</button>
-            <button class="btn" onclick="saveVariable()">Save</button>
+            <div class="api-sources" id="apiSources">
+                <h4 style="margin-bottom: 10px;">Data Sources:</h4>
+                <div class="api-source">
+                    <span class="status-indicator status-fresh"></span>
+                    <strong>Revenue per TH/day:</strong> $<span id="revenueValue">0.00</span>
+                    <small>(Updated <span id="revenueAge">0</span>s ago from mempool.space)</small>
+                </div>
+                <div class="api-source">
+                    <span class="status-indicator status-fresh"></span>
+                    <strong>BTC Price:</strong> $<span id="btcPrice">0.00</span>
+                    <small>(Updated <span id="priceAge">0</span>s ago from mempool.space)</small>
+                </div>
+                <div class="api-source">
+                    <span class="status-indicator status-fresh"></span>
+                    <strong>Network Hashrate:</strong> <span id="hashrate">0.00</span> TH/s
+                    <small>(Updated <span id="hashrateAge">0</span>s ago from mempool.space)</small>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Global data zones
-        let Z1 = {
-            electricityCost: 0.10,
-            totalReward: 0,
-            btcPrice: 0,
-            networkHashrate: 0,
-            dailyRevenue: 0,
-            lastUpdated: {}
-        };
+        class BitcoinMiningCalculator {
+            constructor() {
+                this.z1Data = {}; // Current market data
+                this.z2Data = {}; // Custom user data
+                this.isUsingCustomData = false;
+                this.lastApiCall = 0;
+                this.apiCacheTime = 60000; // 1 minute
+                
+                this.initializeElements();
+                this.loadUserData();
+                this.setupEventListeners();
+                this.loadInitialData();
+            }
 
-        let Z2 = {
-            electricityCost: 0.10,
-            totalReward: 0,
-            btcPrice: 0,
-            networkHashrate: 0,
-            dailyRevenue: 0
-        };
+            initializeElements() {
+                this.electricityCostInput = document.getElementById('electricityCost');
+                this.breakevenResult = document.getElementById('breakevenResult');
+                this.dataToggle = document.getElementById('dataToggle');
+                this.formulaDisplay = document.getElementById('formulaDisplay');
+                this.chart = document.getElementById('efficiencyChart');
+                this.apiSources = document.getElementById('apiSources');
+            }
 
-        let currentDataSource = 'Z1'; // 'Z1' for market data, 'Z2' for custom
-        let chart = null;
-        let currentEditVariable = null;
+            setupEventListeners() {
+                this.electricityCostInput.addEventListener('input', () => {
+                    this.calculateBreakeven();
+                    this.updateChart();
+                    this.saveUserData();
+                });
 
-        // API endpoints
-        const APIs = {
-            rewards: 'https://mempool.space/api/v1/mining/reward-stats/144',
-            prices: 'https://mempool.space/api/v1/prices',
-            hashrate: 'https://mempool.space/api/v1/mining/hashrate/1d'
-        };
+                this.dataToggle.addEventListener('click', () => {
+                    this.toggleDataSource();
+                });
 
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFromStorage();
-            setupEventListeners();
-            loadMarketData();
+                // Make formula values editable
+                document.querySelectorAll('.editable-value').forEach(element => {
+                    element.addEventListener('click', (e) => {
+                        this.editFormulaValue(e.target);
+                    });
+                });
+
+                // Chart interaction
+                this.chart.addEventListener('mousemove', (e) => {
+                    this.updateChartTooltip(e);
+                });
+
+                this.chart.addEventListener('mouseleave', () => {
+                    this.hideChartTooltip();
+                });
+            }
+
+            async loadInitialData() {
+                const now = Date.now();
+                const shouldFetchFresh = (now - this.lastApiCall) > this.apiCacheTime;
+
+                if (shouldFetchFresh) {
+                    await this.fetchMarketData();
+                } else {
+                    // Use cached data if available
+                    const cachedData = this.getCachedData();
+                    if (cachedData) {
+                        this.z1Data = cachedData;
+                    } else {
+                        await this.fetchMarketData();
+                    }
+                }
+
+                this.initializeZ2Data();
+                this.calculateBreakeven();
+                this.updateChart();
+                this.updateApiSourcesDisplay();
+            }
+
+            async fetchMarketData() {
+                try {
+                    document.body.classList.add('loading');
+                    
+                    // Simulate API calls (in real implementation, these would be actual API calls)
+                    const [rewardData, priceData, hashrateData] = await Promise.all([
+                        this.mockApiCall('https://mempool.space/api/v1/mining/reward-stats/144', {totalReward: 637.5}),
+                        this.mockApiCall('https://mempool.space/api/v1/prices', {USD: 65000}),
+                        this.mockApiCall('https://mempool.space/api/v1/mining/hashrate/1d', {currentHashrate: 750000000000000000}) // 750 EH/s in TH/s
+                    ]);
+
+                    const revenue = (rewardData.totalReward * priceData.USD) / (hashrateData.currentHashrate / 1000000000000); // Convert to TH/s
+
+                    this.z1Data = {
+                        revenue: revenue,
+                        btcPrice: priceData.USD,
+                        networkHashrate: hashrateData.currentHashrate / 1000000000000, // Convert to TH/s
+                        electricityCost: 0.10,
+                        lastUpdated: Date.now()
+                    };
+
+                    this.cacheData(this.z1Data);
+                    this.lastApiCall = Date.now();
+
+                } catch (error) {
+                    console.error('Error fetching market data:', error);
+                    // Use fallback data
+                    this.z1Data = {
+                        revenue: 0.055,
+                        btcPrice: 65000,
+                        networkHashrate: 750000,
+                        electricityCost: 0.10,
+                        lastUpdated: Date.now()
+                    };
+                } finally {
+                    document.body.classList.remove('loading');
+                }
+            }
+
+            async mockApiCall(url, mockData) {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+                return mockData;
+            }
+
+            initializeZ2Data() {
+                this.z2Data = {
+                    ...this.z1Data,
+                    electricityCost: parseFloat(this.electricityCostInput.value) || 0.10
+                };
+            }
+
+            calculateBreakeven() {
+                const data = this.getCurrentData();
+                const electricityCost = parseFloat(this.electricityCostInput.value) || 0.10;
+                
+                // Update current data
+                data.electricityCost = electricityCost;
+                
+                // Formula: Breakeven (J/TH/s) = Revenue × 41.66667 ÷ electricity cost
+                const breakeven = (data.revenue * 41.66667) / electricityCost;
+                
+                this.breakevenResult.textContent = `${breakeven.toFixed(2)} J/TH/s`;
+                this.updateFormulaDisplay();
+            }
+
+            getCurrentData() {
+                return this.isUsingCustomData ? this.z2Data : this.z1Data;
+            }
+
+            updateFormulaDisplay() {
+                const data = this.getCurrentData();
+                const revenueSpan = this.formulaDisplay.querySelector('[data-field="revenue"]');
+                const electricitySpan = this.formulaDisplay.querySelector('[data-field="electricityCost"]');
+                
+                if (revenueSpan) revenueSpan.textContent = data.revenue.toFixed(6);
+                if (electricitySpan) electricitySpan.textContent = data.electricityCost.toFixed(3);
+            }
+
+            updateChart() {
+                const baseElectricityCost = parseFloat(this.electricityCostInput.value) || 0.10;
+                const data = this.getCurrentData();
+                
+                // Clear existing chart content
+                this.chart.innerHTML = '';
+                
+                // Create chart points
+                const chartWidth = this.chart.offsetWidth;
+                const chartHeight = this.chart.offsetHeight;
+                
+                for (let x = 0; x < chartWidth; x += 2) {
+                    const electricityCostRange = baseElectricityCost * 2; // Show range from 0 to 2x current cost
+                    const electricityCost = (x / chartWidth) * electricityCostRange;
+                    const efficiency = (data.revenue * 41.66667) / Math.max(electricityCost, 0.001);
+                    
+                    // Scale efficiency to chart height (assume max efficiency of 100 J/TH/s for scaling)
+                    const maxEfficiency = 100;
+                    const y = chartHeight - (Math.min(efficiency, maxEfficiency) / maxEfficiency) * chartHeight;
+                    
+                    const point = document.createElement('div');
+                    point.style.position = 'absolute';
+                    point.style.left = x + 'px';
+                    point.style.top = y + 'px';
+                    point.style.width = '2px';
+                    point.style.height = '2px';
+                    point.style.background = '#667eea';
+                    point.style.borderRadius = '1px';
+                    this.chart.appendChild(point);
+                }
+            }
+
+            updateChartTooltip(event) {
+                const rect = this.chart.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const chartWidth = this.chart.offsetWidth;
+                
+                const baseElectricityCost = parseFloat(this.electricityCostInput.value) || 0.10;
+                const electricityCostRange = baseElectricityCost * 2;
+                const electricityCost = (x / chartWidth) * electricityCostRange;
+                const data = this.getCurrentData();
+                const efficiency = (data.revenue * 41.66667) / Math.max(electricityCost, 0.001);
+                
+                // Create or update tooltip
+                let tooltip = this.chart.querySelector('.tooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    this.chart.appendChild(tooltip);
+                }
+                
+                tooltip.style.left = event.clientX - rect.left + 'px';
+                tooltip.style.top = event.clientY - rect.top + 'px';
+                tooltip.innerHTML = `
+                    Electricity: $${electricityCost.toFixed(3)}/kWh<br>
+                    Efficiency: ${efficiency.toFixed(2)} J/TH/s
+                `;
+                tooltip.style.display = 'block';
+            }
+
+            hideChartTooltip() {
+                const tooltip = this.chart.querySelector('.tooltip');
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            }
+
+            toggleDataSource() {
+                this.isUsingCustomData = !this.isUsingCustomData;
+                this.dataToggle.classList.toggle('active', this.isUsingCustomData);
+                
+                // Update display
+                const labels = document.querySelectorAll('.data-source-toggle span');
+                labels[0].style.fontWeight = this.isUsingCustomData ? 'normal' : 'bold';
+                labels[1].style.fontWeight = this.isUsingCustomData ? 'bold' : 'normal';
+                
+                this.calculateBreakeven();
+                this.updateChart();
+                this.updateApiSourcesDisplay();
+            }
+
+            editFormulaValue(element) {
+                const field = element.dataset.field;
+                const currentValue = element.textContent;
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = currentValue;
+                input.step = field === 'revenue' ? '0.000001' : '0.001';
+                input.style.width = '80px';
+                input.style.background = '#fff3cd';
+                input.style.border = '1px solid #ffc107';
+                input.style.borderRadius = '4px';
+                input.style.padding = '2px 6px';
+                
+                element.replaceWith(input);
+                input.focus();
+                input.select();
+                
+                const saveEdit = () => {
+                    const newValue = parseFloat(input.value) || 0;
+                    
+                    // Switch to custom data mode
+                    if (!this.isUsingCustomData) {
+                        this.isUsingCustomData = true;
+                        this.dataToggle.classList.add('active');
+                        const labels = document.querySelectorAll('.data-source-toggle span');
+                        labels[0].style.fontWeight = 'normal';
+                        labels[1].style.fontWeight = 'bold';
+                    }
+                    
+                    // Update Z2 data
+                    this.z2Data[field] = newValue;
+                    if (field === 'electricityCost') {
+                        this.electricityCostInput.value = newValue;
+                    }
+                    
+                    // Restore element
+                    const newElement = document.createElement('span');
+                    newElement.className = 'editable-value';
+                    newElement.dataset.field = field;
+                    newElement.textContent = newValue.toFixed(field === 'revenue' ? 6 : 3);
+                    newElement.addEventListener('click', (e) => {
+                        this.editFormulaValue(e.target);
+                    });
+                    
+                    input.replaceWith(newElement);
+                    
+                    this.calculateBreakeven();
+                    this.updateChart();
+                    this.saveUserData();
+                };
+                
+                input.addEventListener('blur', saveEdit);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        saveEdit();
+                    }
+                });
+            }
+
+            updateApiSourcesDisplay() {
+                const data = this.getCurrentData();
+                const now = Date.now();
+                const age = Math.floor((now - (data.lastUpdated || now)) / 1000);
+                
+                document.getElementById('revenueValue').textContent = data.revenue.toFixed(6);
+                document.getElementById('btcPrice').textContent = data.btcPrice.toLocaleString();
+                document.getElementById('hashrate').textContent = (data.networkHashrate || 0).toLocaleString();
+                
+                document.getElementById('revenueAge').textContent = age;
+                document.getElementById('priceAge').textContent = age;
+                document.getElementById('hashrateAge').textContent = age;
+                
+                // Update status indicators
+                const indicators = this.apiSources.querySelectorAll('.status-indicator');
+                const statusClass = age > 300 ? 'status-stale' : 'status-fresh'; // 5 minutes threshold
+                indicators.forEach(indicator => {
+                    indicator.className = `status-indicator ${statusClass}`;
+                });
+            }
+
+            saveUserData() {
+                const userData = {
+                    electricityCost: this.electricityCostInput.value,
+                    z2Data: this.z2Data,
+                    isUsingCustomData: this.isUsingCustomData
+                };
+                localStorage.setItem('bitcoinMiningCalculator', JSON.stringify(userData));
+            }
+
+            loadUserData() {
+                try {
+                    const userData = JSON.parse(localStorage.getItem('bitcoinMiningCalculator') || '{}');
+                    if (userData.electricityCost) {
+                        this.electricityCostInput.value = userData.electricityCost;
+                    }
+                    if (userData.z2Data) {
+                        this.z2Data = userData.z2Data;
+                    }
+                    if (userData.isUsingCustomData) {
+                        this.isUsingCustomData = userData.isUsingCustomData;
+                        this.dataToggle.classList.add('active');
+                    }
+                } catch (error) {
+                    console.log('No saved user data found');
+                }
+            }
+
+            cacheData(data) {
+                localStorage.setItem('bitcoinMiningCalculator_cache', JSON.stringify(data));
+            }
+
+            getCachedData() {
+                try {
+                    return JSON.parse(localStorage.getItem('bitcoinMiningCalculator_cache') || 'null');
+                } catch (error) {
+                    return null;
+                }
+            }
+        }
+
+        // Initialize the calculator when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BitcoinMiningCalculator();
         });
-
-        function setupEventListeners() {
-            // Primary electricity cost input
-            const electricityCostInput = document.getElementById('electricityCost');
-            electricityCostInput.addEventListener('input', function() {
-                const cost = parseFloat(this.value) || 0.10;
-                Z1.electricityCost = cost;
-                Z2.electricityCost = cost;
-                calculateAndUpdate();
-            });
-
-            // Data source toggle
-            const toggle = document.getElementById('dataToggle');
-            toggle.addEventListener('click', function() {
-                currentDataSource = currentDataSource === 'Z1' ? 'Z2' : 'Z1';
-                updateDataSourceDisplay();
-                calculateAndUpdate();
-                saveToStorage();
-            });
-
-            // Formula variable clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('formula-variable') && e.target.classList.contains('editable')) {
-                    openEditor(e.target.dataset.var);
-                }
-            });
-
-            // Modal backdrop click
-            document.getElementById('editorBackdrop').addEventListener('click', closeEditor);
-        }
-
-        async function loadMarketData() {
-            updateAPIStatus('rewards', 'Loading...', 'loading');
-            updateAPIStatus('prices', 'Loading...', 'loading');
-            updateAPIStatus('hashrate', 'Loading...', 'loading');
-
-            try {
-                // Load rewards data
-                const rewardsResponse = await fetch(APIs.rewards);
-                const rewardsData = await rewardsResponse.json();
-                Z1.totalReward = rewardsData.totalReward;
-                Z1.lastUpdated.rewards = new Date();
-                updateAPIStatus('rewards', `✅ ${Z1.totalReward.toFixed(4)} BTC`, 'success');
-
-                // Load price data
-                const pricesResponse = await fetch(APIs.prices);
-                const pricesData = await pricesResponse.json();
-                Z1.btcPrice = pricesData.USD;
-                Z1.lastUpdated.prices = new Date();
-                updateAPIStatus('prices', `✅ $${Z1.btcPrice.toLocaleString()}`, 'success');
-
-                // Load hashrate data
-                const hashrateResponse = await fetch(APIs.hashrate);
-                const hashrateData = await hashrateResponse.json();
-                Z1.networkHashrate = hashrateData.currentHashrate;
-                Z1.lastUpdated.hashrate = new Date();
-                updateAPIStatus('hashrate', `✅ ${(Z1.networkHashrate / 1e18).toFixed(1)} EH/s`, 'success');
-
-                // Calculate daily revenue
-                Z1.dailyRevenue = (Z1.totalReward * Z1.btcPrice) / (Z1.networkHashrate / 1e12);
-
-                // Initialize Z2 with Z1 values if empty
-                if (Z2.totalReward === 0) {
-                    Z2.totalReward = Z1.totalReward;
-                    Z2.btcPrice = Z1.btcPrice;
-                    Z2.networkHashrate = Z1.networkHashrate;
-                    Z2.dailyRevenue = Z1.dailyRevenue;
-                }
-
-                calculateAndUpdate();
-
-            } catch (error) {
-                console.error('Error loading market data:', error);
-                updateAPIStatus('rewards', '❌ Failed to load', 'error');
-                updateAPIStatus('prices', '❌ Failed to load', 'error');
-                updateAPIStatus('hashrate', '❌ Failed to load', 'error');
-            }
-        }
-
-        function updateAPIStatus(source, message, status) {
-            const grid = document.getElementById('apiStatusGrid');
-            let card = document.getElementById(`status-${source}`);
-            
-            if (!card) {
-                card = document.createElement('div');
-                card.id = `status-${source}`;
-                card.className = 'api-status-card';
-                grid.appendChild(card);
-            }
-
-            const lastUpdated = Z1.lastUpdated[source];
-            const timeAgo = lastUpdated ? Math.floor((new Date() - lastUpdated) / 1000) : null;
-            const timeText = timeAgo !== null ? `${timeAgo}s ago` : 'Never';
-
-            card.className = `api-status-card ${status}`;
-            card.innerHTML = `
-                <div class="status-source">${source.charAt(0).toUpperCase() + source.slice(1)} API</div>
-                <div>${message}</div>
-                <div class="status-time">Last updated: ${timeText}</div>
-            `;
-        }
-
-        function calculateBreakEvenEfficiency(electricityCost, dailyRevenue) {
-            // J/TH = (Electricity Cost $/kWh × 24 hours × 1000 W/kW) ÷ (Daily Revenue $/TH)
-            return (electricityCost * 24 * 1000) / dailyRevenue;
-        }
-
-        function calculateAndUpdate() {
-            const currentData = currentDataSource === 'Z1' ? Z1 : Z2;
-            
-            if (currentData.dailyRevenue > 0) {
-                const breakEven = calculateBreakEvenEfficiency(currentData.electricityCost, currentData.dailyRevenue);
-                document.getElementById('breakEvenResult').textContent = `${breakEven.toFixed(0)} J/TH`;
-                updateChart();
-                updateFormulaDisplay();
-            }
-        }
-
-        function updateChart() {
-            const ctx = document.getElementById('efficiencyChart').getContext('2d');
-            const currentData = currentDataSource === 'Z1' ? Z1 : Z2;
-            
-            // Generate data points for different electricity costs
-            const electricityRange = [];
-            const efficiencyData = [];
-            
-            const baseCost = currentData.electricityCost;
-            
-            for (let i = -50; i <= 100; i += 5) {
-                const costMultiplier = 1 + (i / 100);
-                const testCost = Math.max(0.01, baseCost * costMultiplier);
-                const efficiency = calculateBreakEvenEfficiency(testCost, currentData.dailyRevenue);
-                
-                electricityRange.push(testCost.toFixed(3));
-                efficiencyData.push(efficiency);
-            }
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: electricityRange,
-                    datasets: [{
-                        label: 'Break-Even Efficiency (J/TH)',
-                        data: efficiencyData,
-                        borderColor: currentDataSource === 'Z1' ? '#667eea' : '#28a745',
-                        backgroundColor: currentDataSource === 'Z1' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(40, 167, 69, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: function(context) {
-                            const value = parseFloat(context.parsed.x);
-                            return Math.abs(value - baseCost) < 0.001 ? '#ff6b6b' : (currentDataSource === 'Z1' ? '#667eea' : '#28a745');
-                        },
-                        pointRadius: function(context) {
-                            const value = parseFloat(context.parsed.x);
-                            return Math.abs(value - baseCost) < 0.001 ? 8 : 4;
-                        }
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return `Electricity Cost: $${context[0].label}/kWh`;
-                                },
-                                label: function(context) {
-                                    return `Break-Even: ${context.parsed.y.toFixed(0)} J/TH`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Electricity Cost ($/kWh)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Break-Even Efficiency (J/TH)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateFormulaDisplay() {
-            const currentData = currentDataSource === 'Z1' ? Z1 : Z2;
-            const formula = document.getElementById('formulaDisplay');
-            
-            formula.innerHTML = `
-                Break-Even J/TH = (<span class="formula-variable" data-var="electricityCost">${currentData.electricityCost.toFixed(3)} $/kWh</span> × 24 × 1000) ÷ <span class="formula-variable editable" data-var="dailyRevenue">${currentData.dailyRevenue.toFixed(6)} $/TH/day</span>
-                <br><br>
-                Where Daily Revenue per TH = (<span class="formula-variable editable" data-var="totalReward">${currentData.totalReward.toFixed(4)} BTC</span> × <span class="formula-variable editable" data-var="btcPrice">$${currentData.btcPrice.toLocaleString()}</span>) ÷ <span class="formula-variable editable" data-var="networkHashrate">${(currentData.networkHashrate / 1e18).toFixed(2)} EH/s</span>
-            `;
-        }
-
-        function updateDataSourceDisplay() {
-            const toggle = document.getElementById('dataToggle');
-            const label = document.getElementById('dataSourceLabel');
-            
-            if (currentDataSource === 'Z2') {
-                toggle.classList.add('active');
-                label.textContent = 'Using Custom Data';
-                label.style.color = '#28a745';
-            } else {
-                toggle.classList.remove('active');
-                label.textContent = 'Using Current Market Data';
-                label.style.color = '#667eea';
-            }
-        }
-
-        function openEditor(variable) {
-            if (currentDataSource === 'Z1') {
-                // Switch to Z2 automatically when editing
-                currentDataSource = 'Z2';
-                updateDataSourceDisplay();
-            }
-
-            currentEditVariable = variable;
-            const editor = document.getElementById('variableEditor');
-            const backdrop = document.getElementById('editorBackdrop');
-            const title = document.getElementById('editorTitle');
-            const label = document.getElementById('editorLabel');
-            const input = document.getElementById('editorInput');
-
-            const variableNames = {
-                totalReward: 'Total Daily BTC Rewards',
-                btcPrice: 'Bitcoin Price (USD)',
-                networkHashrate: 'Network Hashrate (H/s)',
-                dailyRevenue: 'Daily Revenue per TH ($/TH/day)'
-            };
-
-            title.textContent = `Edit ${variableNames[variable]}`;
-            label.textContent = variableNames[variable];
-            input.value = Z2[variable];
-
-            editor.classList.add('active');
-            backdrop.classList.add('active');
-            input.focus();
-        }
-
-        function closeEditor() {
-            document.getElementById('variableEditor').classList.remove('active');
-            document.getElementById('editorBackdrop').classList.remove('active');
-            currentEditVariable = null;
-        }
-
-        function saveVariable() {
-            if (currentEditVariable) {
-                const newValue = parseFloat(document.getElementById('editorInput').value);
-                if (!isNaN(newValue)) {
-                    Z2[currentEditVariable] = newValue;
-                    
-                    // Recalculate daily revenue if component variables changed
-                    if (['totalReward', 'btcPrice', 'networkHashrate'].includes(currentEditVariable)) {
-                        Z2.dailyRevenue = (Z2.totalReward * Z2.btcPrice) / (Z2.networkHashrate / 1e12);
-                    }
-                    
-                    calculateAndUpdate();
-                    saveToStorage();
-                }
-            }
-            closeEditor();
-        }
-
-        function saveToStorage() {
-            const data = {
-                Z2: Z2,
-                currentDataSource: currentDataSource,
-                electricityCost: Z1.electricityCost
-            };
-            // Using a simple variable instead of localStorage for Claude.ai compatibility
-            window.savedData = data;
-        }
-
-        function loadFromStorage() {
-            if (window.savedData) {
-                const data = window.savedData;
-                Z2 = { ...Z2, ...data.Z2 };
-                currentDataSource = data.currentDataSource || 'Z1';
-                
-                if (data.electricityCost) {
-                    document.getElementById('electricityCost').value = data.electricityCost;
-                    Z1.electricityCost = data.electricityCost;
-                    Z2.electricityCost = data.electricityCost;
-                }
-                
-                updateDataSourceDisplay();
-            } else {
-                // Set default electricity cost
-                document.getElementById('electricityCost').value = '0.10';
-            }
-        }
-
-        // Auto-refresh market data every 5 minutes
-        setInterval(loadMarketData, 5 * 60 * 1000);
     </script>
 </body>
 </html>

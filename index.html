@@ -11,27 +11,77 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --container-bg: rgba(44, 62, 80, 0.95);
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --card-bg: rgba(52, 73, 94, 0.8);
+            --input-bg: #34495e;
+            --border-color: #4a5f7a;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --chart-bg: rgba(44, 62, 80, 0.9);
+            --axis-color: #7f8c8d;
+            --breakeven-color: #e74c3c;
+            --profitable-color: #27ae60;
+            --unprofitable-color: #e74c3c;
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --container-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #333;
+            --text-secondary: #666;
+            --card-bg: #f8f9fa;
+            --input-bg: white;
+            --border-color: #e9ecef;
+            --chart-bg: white;
+            --axis-color: #666;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--container-bg);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
 
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: var(--text-primary);
             margin-bottom: 10px;
             font-size: 2.5em;
             font-weight: 300;
@@ -40,12 +90,12 @@
         .subtitle {
             text-align: center;
             margin-bottom: 30px;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 1.1em;
         }
 
         .inputs-section {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: var(--gradient-1);
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
@@ -78,6 +128,52 @@
             text-align: right;
         }
 
+        .input-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
         .input-group input {
             padding: 12px 20px;
             border: none;
@@ -86,6 +182,8 @@
             text-align: center;
             width: 150px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
 
         .input-group span {
@@ -94,7 +192,7 @@
         }
 
         .result-section {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: var(--gradient-2);
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
@@ -109,38 +207,47 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
+        .result-explanation {
+            margin-top: 15px;
+            font-size: 0.95em;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
         .formula-section {
-            background: #f8f9fa;
+            background: var(--card-bg);
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
         }
 
         .formula-display {
-            background: white;
+            background: var(--container-bg);
             padding: 20px;
             border-radius: 10px;
             font-family: 'Courier New', monospace;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--border-color);
             text-align: center;
             font-size: 1.1em;
+            color: var(--text-primary);
         }
 
         .formula-value {
-            background: #e3f2fd;
+            background: rgba(103, 126, 234, 0.2);
             padding: 4px 8px;
             border-radius: 4px;
-            color: #1976d2;
+            color: #667eea;
             font-weight: bold;
         }
 
         .chart-container {
-            background: white;
+            background: var(--chart-bg);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
         }
 
         .chart-wrapper {
@@ -150,40 +257,44 @@
         }
 
         .chart {
-            width: calc(100% - 60px);
-            height: calc(100% - 60px);
+            width: calc(100% - 80px);
+            height: calc(100% - 40px);
             position: absolute;
-            top: 30px;
-            left: 60px;
-            border: 2px solid #e0e0e0;
+            top: 20px;
+            left: 80px;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             cursor: crosshair;
-            background: linear-gradient(to top, #ffebee 0%, #e8f5e8 50%, #fff3e0 100%);
+            background: linear-gradient(to bottom, 
+                rgba(231, 76, 60, 0.1) 0%, 
+                rgba(231, 76, 60, 0.05) 45%, 
+                rgba(39, 174, 96, 0.05) 55%, 
+                rgba(39, 174, 96, 0.1) 100%);
         }
 
         .chart-axis {
             position: absolute;
-            color: #666;
+            color: var(--axis-color);
             font-size: 12px;
         }
 
         .y-axis {
             left: 0;
             top: 0;
-            width: 50px;
-            height: calc(100% - 30px);
+            width: 70px;
+            height: calc(100% - 20px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-end;
             padding-right: 5px;
-            padding-top: 30px;
+            padding-top: 20px;
         }
 
         .x-axis {
             bottom: 0;
-            left: 60px;
-            width: calc(100% - 60px);
+            left: 80px;
+            width: calc(100% - 80px);
             height: 25px;
             display: flex;
             justify-content: space-between;
@@ -193,7 +304,7 @@
         .axis-label {
             position: absolute;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .y-axis-label {
@@ -203,20 +314,13 @@
             transform-origin: center;
         }
 
-        .x-axis-label {
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
         .breakeven-line {
             position: absolute;
             width: 100%;
             height: 2px;
-            background: #ff4444;
+            background: var(--breakeven-color);
             z-index: 10;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 0;
         }
 
         .breakeven-label {
@@ -224,7 +328,7 @@
             right: 5px;
             top: 50%;
             transform: translateY(-50%);
-            background: #ff4444;
+            background: var(--breakeven-color);
             color: white;
             padding: 2px 6px;
             border-radius: 3px;
@@ -234,7 +338,7 @@
 
         .tooltip {
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 8px 12px;
             border-radius: 6px;
@@ -246,6 +350,15 @@
         }
 
         @media (max-width: 768px) {
+            .theme-toggle {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+                display: block;
+                text-align: center;
+            }
+
             .container {
                 padding: 20px;
             }
@@ -279,7 +392,9 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
+    <div class="theme-toggle" id="themeToggle">☀️ Light Mode</div>
+    
     <div class="container">
         <h1>⚡ Watts Worth It</h1>
         <p class="subtitle">Calculate your Bitcoin mining breakeven efficiency</p>
@@ -288,14 +403,28 @@
             <div class="input-row">
                 <div class="input-group">
                     <label for="electricityCost">Electricity Cost:</label>
-                    <input type="number" id="electricityCost" value="0.10" step="0.01" min="0">
+                    <div class="input-controls">
+                        <input type="number" id="electricityCost" value="0.10" step="0.01" min="0" max="0.50">
+                        <div class="slider-container">
+                            <span>$0.00</span>
+                            <input type="range" id="electricitySlider" class="slider" min="0" max="0.50" step="0.01" value="0.10">
+                            <span>$0.50</span>
+                        </div>
+                    </div>
                     <span>$/kWh</span>
                 </div>
             </div>
             <div class="input-row">
                 <div class="input-group">
                     <label for="revenue">Revenue per TH/day:</label>
-                    <input type="number" id="revenue" value="0.055" step="0.001" min="0">
+                    <div class="input-controls">
+                        <input type="number" id="revenue" value="0.055" step="0.001" min="0" max="0.200">
+                        <div class="slider-container">
+                            <span>$0.00</span>
+                            <input type="range" id="revenueSlider" class="slider" min="0" max="0.200" step="0.001" value="0.055">
+                            <span>$0.20</span>
+                        </div>
+                    </div>
                     <span>$</span>
                 </div>
             </div>
@@ -304,27 +433,21 @@
         <div class="result-section">
             <h2>Breakeven Mining Efficiency</h2>
             <div class="result-value" id="breakevenResult">22.92 J/TH/s</div>
-            <p>Miners more efficient than this value will be profitable at your settings</p>
-        </div>
-
-        <div class="formula-section">
-            <h3 style="margin-bottom: 15px; color: #2c3e50; text-align: center;">Formula Breakdown</h3>
-            <div class="formula-display" id="formulaDisplay">
-                <strong>Breakeven Efficiency (J/TH/s) = </strong><br><br>
-                <span class="formula-value" id="revenueDisplay">0.055</span> × 41.66667 ÷ <span class="formula-value" id="electricityDisplay">0.10</span><br><br>
-                <small>Where 41.66667 = 3,600,000 joules/kWh ÷ 86,400 seconds/day</small>
+            <div class="result-explanation">
+                Miners with <strong>lower</strong> J/TH/s values than this number will be profitable.<br>
+                Lower J/TH/s = more efficient = more profitable
             </div>
         </div>
 
         <div class="chart-container">
-            <h3 style="margin-bottom: 15px; color: #2c3e50;">Efficiency vs Electricity Cost</h3>
+            <h3 style="margin-bottom: 15px; color: var(--text-primary);">Efficiency vs Electricity Cost</h3>
             <div class="chart-wrapper">
-                <div class="y-axis">
-                    <span>200%</span>
-                    <span>150%</span>
-                    <span>100%</span>
-                    <span>50%</span>
-                    <span>0%</span>
+                <div class="y-axis" id="yAxis">
+                    <span>0 J/TH/s</span>
+                    <span>15 J/TH/s</span>
+                    <span>30 J/TH/s</span>
+                    <span>45 J/TH/s</span>
+                    <span>60 J/TH/s</span>
                 </div>
                 <div class="x-axis">
                     <span>$0.00</span>
@@ -333,12 +456,18 @@
                     <span>$0.15</span>
                     <span>$0.20</span>
                 </div>
-                <div class="axis-label y-axis-label">% to Breakeven</div>
-                <div class="axis-label x-axis-label">Electricity Cost ($/kWh)</div>
                 <div class="chart" id="efficiencyChart">
-                    <div class="breakeven-line"></div>
-                    <div class="breakeven-label">Breakeven</div>
+                    <div class="breakeven-line" id="breakevenLine"></div>
                 </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h3 style="margin-bottom: 15px; color: var(--text-primary); text-align: center;">Formula Breakdown</h3>
+            <div class="formula-display" id="formulaDisplay">
+                <strong>Breakeven Efficiency (J/TH/s) = </strong><br><br>
+                <span class="formula-value" id="revenueDisplay">0.055</span> × 41.66667 ÷ <span class="formula-value" id="electricityDisplay">0.10</span><br><br>
+                <small>Where 41.66667 = 3,600,000 joules/kWh ÷ 86,400 seconds/day</small>
             </div>
         </div>
     </div>
@@ -355,25 +484,52 @@
 
             initializeElements() {
                 this.electricityCostInput = document.getElementById('electricityCost');
+                this.electricitySlider = document.getElementById('electricitySlider');
                 this.revenueInput = document.getElementById('revenue');
+                this.revenueSlider = document.getElementById('revenueSlider');
                 this.breakevenResult = document.getElementById('breakevenResult');
                 this.formulaDisplay = document.getElementById('formulaDisplay');
                 this.revenueDisplay = document.getElementById('revenueDisplay');
                 this.electricityDisplay = document.getElementById('electricityDisplay');
                 this.chart = document.getElementById('efficiencyChart');
+                this.breakevenLine = document.getElementById('breakevenLine');
+                this.yAxis = document.getElementById('yAxis');
+                this.themeToggle = document.getElementById('themeToggle');
             }
 
             setupEventListeners() {
+                // Input field listeners
                 this.electricityCostInput.addEventListener('input', () => {
+                    this.electricitySlider.value = this.electricityCostInput.value;
                     this.calculateBreakeven();
                     this.updateChart();
                     this.saveUserData();
                 });
 
                 this.revenueInput.addEventListener('input', () => {
+                    this.revenueSlider.value = this.revenueInput.value;
                     this.calculateBreakeven();
                     this.updateChart();
                     this.saveUserData();
+                });
+
+                // Slider listeners
+                this.electricitySlider.addEventListener('input', () => {
+                    this.electricityCostInput.value = this.electricitySlider.value;
+                    this.calculateBreakeven();
+                    this.updateChart();
+                    this.saveUserData();
+                });
+
+                this.revenueSlider.addEventListener('input', () => {
+                    this.revenueInput.value = this.revenueSlider.value;
+                    this.calculateBreakeven();
+                    this.updateChart();
+                    this.saveUserData();
+                });
+
+                this.themeToggle.addEventListener('click', () => {
+                    this.toggleTheme();
                 });
 
                 // Chart interaction
@@ -384,6 +540,20 @@
                 this.chart.addEventListener('mouseleave', () => {
                     this.hideChartTooltip();
                 });
+            }
+
+            toggleTheme() {
+                const body = document.body;
+                const currentTheme = body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                body.setAttribute('data-theme', newTheme);
+                this.themeToggle.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                
+                localStorage.setItem('theme', newTheme);
+                
+                // Redraw chart with new colors
+                setTimeout(() => this.updateChart(), 100);
             }
 
             calculateBreakeven() {
@@ -408,58 +578,94 @@
             updateChart() {
                 const baseElectricityCost = parseFloat(this.electricityCostInput.value) || 0.10;
                 const revenue = parseFloat(this.revenueInput.value) || 0.055;
+                const breakevenEfficiency = (revenue * 41.66667) / baseElectricityCost;
                 
                 // Clear existing chart content except breakeven line
                 const existingPoints = this.chart.querySelectorAll('.chart-point');
                 existingPoints.forEach(point => point.remove());
                 
-                // Create chart points
+                // Update Y-axis labels - flipped so lower efficiency (better) is at bottom
+                const maxEfficiency = Math.max(60, breakevenEfficiency * 2);
+                const yLabels = this.yAxis.querySelectorAll('span');
+                for (let i = 0; i < yLabels.length; i++) {
+                    const value = (maxEfficiency * i) / 4; // Now 0 at bottom, increasing upward
+                    yLabels[i].textContent = value.toFixed(0) + ' J/TH/s';
+                }
+                
+                // Create chart points - show breakeven line across electricity costs
                 const chartWidth = this.chart.offsetWidth;
                 const chartHeight = this.chart.offsetHeight;
                 const maxElectricityCost = 0.20; // Show range from 0 to $0.20/kWh
                 
-                for (let x = 0; x < chartWidth; x += 3) {
-                    const electricityCost = (x / chartWidth) * maxElectricityCost;
-                    if (electricityCost === 0) continue; // Avoid division by zero
+                // Draw breakeven line as connected points
+                for (let x = 0; x < chartWidth; x += 2) {
+                    const electricityCost = Math.max((x / chartWidth) * maxElectricityCost, 0.001);
+                    const breakevenAtThisCost = (revenue * 41.66667) / electricityCost;
                     
-                    const efficiency = (revenue * 41.66667) / electricityCost;
-                    const baseEfficiency = (revenue * 41.66667) / baseElectricityCost;
-                    
-                    // Calculate percentage to breakeven (100% = breakeven, >100% = profitable)
-                    const percentageToBreakeven = (baseEfficiency / efficiency) * 100;
-                    
-                    // Scale to chart (200% max for display)
-                    const maxPercentage = 200;
-                    const y = chartHeight - (Math.min(percentageToBreakeven, maxPercentage) / maxPercentage) * chartHeight;
+                    // Scale to chart - now 0 is at bottom, max at top
+                    const y = chartHeight - (Math.min(breakevenAtThisCost, maxEfficiency) / maxEfficiency) * chartHeight;
                     
                     const point = document.createElement('div');
-                    point.className = 'chart-point';
+                    point.className = 'chart-point breakeven-point';
                     point.style.position = 'absolute';
                     point.style.left = x + 'px';
                     point.style.top = y + 'px';
-                    point.style.width = '3px';
-                    point.style.height = '3px';
-                    point.style.background = percentageToBreakeven >= 100 ? '#4caf50' : '#f44336';
-                    point.style.borderRadius = '50%';
+                    point.style.width = '2px';
+                    point.style.height = '2px';
+                    point.style.background = 'var(--breakeven-color)';
+                    point.style.borderRadius = '1px';
                     this.chart.appendChild(point);
+                }
+                
+                // Add sample efficiency points to show profitable vs unprofitable zones
+                for (let x = 0; x < chartWidth; x += 8) {
+                    const electricityCost = Math.max((x / chartWidth) * maxElectricityCost, 0.001);
+                    const breakevenAtThisCost = (revenue * 41.66667) / electricityCost;
+                    
+                    // Show some sample efficiencies above and below breakeven
+                    const sampleEfficiencies = [
+                        breakevenAtThisCost * 0.7,  // 30% more efficient (profitable)
+                        breakevenAtThisCost * 1.3   // 30% less efficient (unprofitable)
+                    ];
+                    
+                    sampleEfficiencies.forEach(efficiency => {
+                        const y = chartHeight - (Math.min(efficiency, maxEfficiency) / maxEfficiency) * chartHeight;
+                        
+                        const point = document.createElement('div');
+                        point.className = 'chart-point sample-point';
+                        point.style.position = 'absolute';
+                        point.style.left = x + 'px';
+                        point.style.top = y + 'px';
+                        point.style.width = '4px';
+                        point.style.height = '4px';
+                        // Lower efficiency (lower J/TH/s) = more profitable = green
+                        point.style.background = efficiency < breakevenAtThisCost ? 
+                            'var(--profitable-color)' : 'var(--unprofitable-color)';
+                        point.style.borderRadius = '50%';
+                        point.style.opacity = '0.6';
+                        this.chart.appendChild(point);
+                    });
                 }
             }
 
             updateChartTooltip(event) {
                 const rect = this.chart.getBoundingClientRect();
                 const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
                 const chartWidth = this.chart.offsetWidth;
+                const chartHeight = this.chart.offsetHeight;
                 
                 const maxElectricityCost = 0.20;
                 const electricityCost = (x / chartWidth) * maxElectricityCost;
                 const revenue = parseFloat(this.revenueInput.value) || 0.055;
-                const baseElectricityCost = parseFloat(this.electricityCostInput.value) || 0.10;
                 
                 if (electricityCost === 0) return;
                 
-                const efficiency = (revenue * 41.66667) / electricityCost;
-                const baseEfficiency = (revenue * 41.66667) / baseElectricityCost;
-                const percentageToBreakeven = (baseEfficiency / efficiency) * 100;
+                // Calculate what efficiency this point represents
+                const maxEfficiency = Math.max(60, ((revenue * 41.66667) / 0.10) * 2);
+                const efficiencyAtPoint = ((chartHeight - y) / chartHeight) * maxEfficiency;
+                const breakevenAtThisCost = (revenue * 41.66667) / electricityCost;
+                const isProfitable = efficiencyAtPoint < breakevenAtThisCost;
                 
                 // Create or update tooltip
                 let tooltip = this.chart.querySelector('.tooltip');
@@ -473,9 +679,9 @@
                 tooltip.style.top = event.clientY - rect.top + 'px';
                 tooltip.innerHTML = `
                     Electricity: $${electricityCost.toFixed(3)}/kWh<br>
-                    Efficiency: ${efficiency.toFixed(2)} J/TH/s<br>
-                    ${percentageToBreakeven.toFixed(1)}% to breakeven<br>
-                    <strong>${percentageToBreakeven >= 100 ? 'PROFITABLE' : 'NOT PROFITABLE'}</strong>
+                    Miner Efficiency: ${efficiencyAtPoint.toFixed(1)} J/TH/s<br>
+                    Breakeven: ${breakevenAtThisCost.toFixed(1)} J/TH/s<br>
+                    <strong>${isProfitable ? 'PROFITABLE' : 'NOT PROFITABLE'}</strong>
                 `;
                 tooltip.style.display = 'block';
             }
@@ -497,12 +703,20 @@
 
             loadUserData() {
                 try {
+                    // Load theme preference
+                    const savedTheme = localStorage.getItem('theme') || 'dark';
+                    document.body.setAttribute('data-theme', savedTheme);
+                    this.themeToggle.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                    
+                    // Load calculator data
                     const userData = JSON.parse(localStorage.getItem('bitcoinMiningCalculator') || '{}');
                     if (userData.electricityCost) {
                         this.electricityCostInput.value = userData.electricityCost;
+                        this.electricitySlider.value = userData.electricityCost;
                     }
                     if (userData.revenue) {
                         this.revenueInput.value = userData.revenue;
+                        this.revenueSlider.value = userData.revenue;
                     }
                 } catch (error) {
                     console.log('No saved user data found');
